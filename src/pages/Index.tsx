@@ -1,21 +1,14 @@
-
 import { MindMapInput } from "@/components/MindMapInput";
 import { useState, useEffect } from "react";
-
 const Index = () => {
   const [mounted, setMounted] = useState(false);
-
   useEffect(() => {
     setMounted(true);
   }, []);
-
-  return (
-    <div className="min-h-screen w-full bg-gradient-to-b from-white to-sage-50 flex flex-col items-center justify-center px-4">
+  return <div className="min-h-screen w-full bg-gradient-to-b from-white to-sage-50 flex flex-col items-center justify-center px-4">
       <div className={`max-w-4xl mx-auto text-center space-y-12 transition-all duration-1000 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
         <div className="space-y-4">
-          <div className="inline-block px-4 py-1.5 bg-sage-100 rounded-full text-sage-600 text-sm font-medium mb-4 animate-float">
-            Transform Your Ideas
-          </div>
+          <div className="inline-block px-4 py-1.5 bg-sage-100 rounded-full text-sage-600 text-sm font-medium mb-4 animate-float">Map Your Ideas</div>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 tracking-tight">
             Create Beautiful Mind Maps
           </h1>
@@ -36,10 +29,10 @@ const Index = () => {
       {/* Background decoration */}
       <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
         <div className="absolute -top-1/2 -right-1/2 w-full h-full bg-gradient-to-b from-sage-100/20 to-transparent rotate-12 transform-gpu animate-float" />
-        <div className="absolute -bottom-1/2 -left-1/2 w-full h-full bg-gradient-to-t from-sage-100/20 to-transparent -rotate-12 transform-gpu animate-float" style={{ animationDelay: '-3s' }} />
+        <div className="absolute -bottom-1/2 -left-1/2 w-full h-full bg-gradient-to-t from-sage-100/20 to-transparent -rotate-12 transform-gpu animate-float" style={{
+        animationDelay: '-3s'
+      }} />
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
