@@ -25,28 +25,29 @@ export default {
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
-        // Updated Japanese-inspired colors
+        // Updated Japanese-inspired grays
         nezu: {
-          100: "#E8EAEB",
-          200: "#D1D5D6",
-          300: "#A3ACB0",
-          400: "#758389",
-          500: "#47585C", // Rust Grey from image
-          600: "#394548",
-          700: "#2B3436",
-          800: "#1D2324",
-          900: "#0F1112",
+          100: "#F6F7F7", // Lighter gray
+          200: "#E8EAEB", // Light gray
+          300: "#C8C8C9", // Medium light gray
+          400: "#8E9196", // Neutral gray
+          500: "#47585C", // Original rust gray
+          600: "#403E43", // Charcoal gray
+          700: "#333333", // Dark gray
+          800: "#222222", // Darker gray
+          900: "#111111", // Almost black
         },
         nezumi: {
-          100: "#F0F2EE",
-          200: "#E1E5DE",
-          300: "#C8D5BB", // Willow Grey from image
-          400: "#B4C5A5",
-          500: "#A0B58F",
-          600: "#809172",
-          700: "#606D56",
-          800: "#404839",
-          900: "#20241D",
+          50: "#F9FAFB",  // Lightest gray
+          100: "#F1F0FB", // Very light gray
+          200: "#E1E5DE", // Light sage gray
+          300: "#C8D5BB", // Original willow gray
+          400: "#9F9EA1", // Silver gray
+          500: "#8A898C", // Medium gray
+          600: "#666666", // Medium dark gray
+          700: "#444444", // Dark gray
+          800: "#292929", // Very dark gray
+          900: "#171717", // Almost black
         },
         primary: {
           DEFAULT: "hsl(var(--primary))",
