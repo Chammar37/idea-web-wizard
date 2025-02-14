@@ -36,7 +36,7 @@
   }
 
   ::selection {
-    @apply bg-sage-200 text-sage-900;
+    @apply bg-nezumi-300 text-nezu-900;
   }
 }
 
