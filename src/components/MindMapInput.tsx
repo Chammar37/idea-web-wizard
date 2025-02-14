@@ -34,12 +34,12 @@ export const MindMapInput = () => {
           placeholder="Enter your topic..."
           value={topic}
           onChange={(e) => setTopic(e.target.value)}
-          className="w-full px-6 py-4 text-lg transition-all duration-300 bg-white/60 backdrop-blur-sm border border-sage-100 rounded-lg focus:outline-none focus:ring-1 focus:ring-sage-200 focus:border-sage-200 placeholder:text-gray-400 font-light tracking-wide"
+          className="w-full px-6 py-4 text-lg transition-all duration-300 bg-white/60 backdrop-blur-sm border border-nezumi-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-nezumi-300 focus:border-nezumi-300 placeholder:text-gray-400 font-light tracking-wide"
         />
       </div>
       <Button
         type="submit"
-        className="w-full py-6 text-base font-light tracking-wider text-sage-900 transition-all duration-300 bg-sage-50 hover:bg-sage-100 border border-sage-200 rounded-lg flex items-center justify-center gap-3 group"
+        className="w-full py-6 text-base font-light tracking-wider text-nezu-500 transition-all duration-300 bg-nezumi-300/30 hover:bg-nezumi-300/50 border border-nezumi-300 rounded-lg flex items-center justify-center gap-3 group"
       >
         Begin Your Journey
         <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />

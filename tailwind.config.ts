@@ -25,17 +25,28 @@ export default {
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
-        sage: {
-          50: "#f4f7f4",
-          100: "#e6ede6",
-          200: "#c8d7c9",
-          300: "#86A789",
-          400: "#729775",
-          500: "#5e7e61",
-          600: "#4b654e",
-          700: "#3d513f",
-          800: "#314133",
-          900: "#28352a",
+        // Updated Japanese-inspired colors
+        nezu: {
+          100: "#E8EAEB",
+          200: "#D1D5D6",
+          300: "#A3ACB0",
+          400: "#758389",
+          500: "#47585C", // Rust Grey from image
+          600: "#394548",
+          700: "#2B3436",
+          800: "#1D2324",
+          900: "#0F1112",
+        },
+        nezumi: {
+          100: "#F0F2EE",
+          200: "#E1E5DE",
+          300: "#C8D5BB", // Willow Grey from image
+          400: "#B4C5A5",
+          500: "#A0B58F",
+          600: "#809172",
+          700: "#606D56",
+          800: "#404839",
+          900: "#20241D",
         },
         primary: {
           DEFAULT: "hsl(var(--primary))",
