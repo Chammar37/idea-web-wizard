@@ -10,7 +10,7 @@ const Index = () => {
   }, []);
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-b from-white to-nezumi-300/30 flex flex-col items-center justify-center px-4">
+    <div className="min-h-screen w-full bg-gradient-to-b from-white to-nezumi-300/30 flex flex-col items-center justify-center px-4 overflow-hidden">
       <div className={`max-w-3xl mx-auto text-center space-y-16 transition-all duration-1000 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
         <div className="space-y-8">
           <div className="inline-block px-6 py-1.5 bg-nezumi-300/20 border border-nezumi-300 rounded-full text-nezu-500 text-sm font-light tracking-wide mb-4">
@@ -35,8 +35,36 @@ const Index = () => {
         </div>
       </div>
 
-      {/* Background decoration - more subtle and minimal */}
-      <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none opacity-30">
+      {/* Floating nodes background */}
+      <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+        {/* Large central node */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 rounded-full bg-nezumi-200/20 border border-nezumi-300/30 animate-float" />
+        
+        {/* Connected nodes with lines */}
+        <div className="absolute top-1/3 left-1/4 w-20 h-20 rounded-full bg-nezu-200/10 border border-nezu-300/20 animate-float [animation-delay:1s]">
+          <div className="absolute w-32 h-px bg-gradient-to-r from-nezumi-300/20 to-transparent -right-32 top-1/2" />
+        </div>
+        
+        <div className="absolute top-2/3 right-1/4 w-24 h-24 rounded-full bg-nezumi-400/10 border border-nezumi-300/20 animate-float [animation-delay:2s]">
+          <div className="absolute w-40 h-px bg-gradient-to-l from-nezumi-300/20 to-transparent -left-40 top-1/2" />
+        </div>
+        
+        <div className="absolute bottom-1/4 left-1/3 w-16 h-16 rounded-full bg-nezu-300/10 border border-nezu-400/20 animate-float [animation-delay:3s]">
+          <div className="absolute w-24 h-px bg-gradient-to-r from-nezumi-300/20 to-transparent -right-24 top-1/2 rotate-45" />
+        </div>
+        
+        <div className="absolute top-1/4 right-1/3 w-28 h-28 rounded-full bg-nezumi-200/10 border border-nezumi-300/20 animate-float [animation-delay:4s]">
+          <div className="absolute w-32 h-px bg-gradient-to-l from-nezumi-300/20 to-transparent -left-32 top-1/2 -rotate-45" />
+        </div>
+
+        {/* Small decorative nodes */}
+        <div className="absolute top-1/4 left-1/2 w-12 h-12 rounded-full bg-nezu-200/10 border border-nezu-300/20 animate-float [animation-delay:2.5s]" />
+        <div className="absolute bottom-1/3 right-1/2 w-10 h-10 rounded-full bg-nezumi-300/10 border border-nezumi-400/20 animate-float [animation-delay:3.5s]" />
+        <div className="absolute top-2/3 left-1/3 w-8 h-8 rounded-full bg-nezu-200/5 border border-nezu-300/10 animate-float [animation-delay:4.5s]" />
+      </div>
+
+      {/* Subtle gradient overlays */}
+      <div className="fixed inset-0 -z-20 overflow-hidden pointer-events-none opacity-30">
         <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-b from-nezumi-300/10 to-transparent rotate-45 transform-gpu" />
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-t from-nezumi-300/10 to-transparent -rotate-45 transform-gpu" />
       </div>
