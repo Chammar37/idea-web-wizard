@@ -12,6 +12,7 @@ import {
   Edge,
   Position,
   useReactFlow,
+  BackgroundVariant,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { PlusCircle, Trash2 } from "lucide-react";
@@ -145,7 +146,7 @@ const MindMap = () => {
           nodeColor="#C8D5BB"
           maskColor="rgb(255, 255, 255, 0.8)"
         />
-        <Background color="#C8D5BB" variant="dots" />
+        <Background color="#C8D5BB" variant={BackgroundVariant.Dots} />
       </ReactFlow>
     </div>
   );
