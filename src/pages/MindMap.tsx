@@ -1,4 +1,3 @@
-
 import { useCallback, useState, useEffect } from 'react';
 import {
   ReactFlow,
@@ -25,7 +24,6 @@ const MindMap = () => {
   const { setNodes } = useReactFlow();
   const topic = location.state?.topic || 'My Topic';
 
-  // Initialize with center node
   const initialNodes: Node[] = [
     {
       id: 'center',
@@ -49,7 +47,6 @@ const MindMap = () => {
   const [nodes, setLocalNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
-  // Load saved data from localStorage
   useEffect(() => {
     const savedNodes = localStorage.getItem('mindmap-nodes');
     const savedEdges = localStorage.getItem('mindmap-edges');
@@ -60,7 +57,6 @@ const MindMap = () => {
     }
   }, []);
 
-  // Save to localStorage whenever nodes or edges change
   useEffect(() => {
     localStorage.setItem('mindmap-nodes', JSON.stringify(nodes));
     localStorage.setItem('mindmap-edges', JSON.stringify(edges));
@@ -70,20 +66,41 @@ const MindMap = () => {
     setEdges((eds) => addEdge(params, eds));
   }, [setEdges]);
 
+  const getNodeColor = (node: Node) => {
+    if (node.id === 'center') return 'rgba(200, 213, 187, 0.8)';
+    
+    let currentNode = node;
+    let layer = 0;
+    while (currentNode) {
+      const parentEdge = edges.find(e => e.target === currentNode.id);
+      if (!parentEdge) break;
+      layer++;
+      currentNode = nodes.find(n => n.id === parentEdge.source)!;
+    }
+
+    switch (layer) {
+      case 1: return 'rgba(155, 135, 245, 0.8)';
+      case 2: return 'rgba(242, 252, 226, 0.8)';
+      default: return 'rgba(254, 198, 161, 0.8)';
+    }
+  };
+
   const addChildNode = useCallback((parentNode: Node) => {
     const newId = `node-${nodes.length + 1}`;
     const parentPosition = parentNode.position;
     const angle = Math.random() * 2 * Math.PI;
     const distance = 200;
     
+    const position = {
+      x: parentPosition.x + Math.cos(angle) * distance,
+      y: parentPosition.y + Math.sin(angle) * distance,
+    };
+    
     const newNode: Node = {
       id: newId,
       type: 'mindMap',
       data: { label: 'New Idea' },
-      position: {
-        x: parentPosition.x + Math.cos(angle) * distance,
-        y: parentPosition.y + Math.sin(angle) * distance,
-      },
+      position: parentPosition,
       style: {
         width: 120,
         height: 50,
@@ -94,7 +111,7 @@ const MindMap = () => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        animation: 'spawn 0.3s ease-out',
+        opacity: 0.9,
       },
     };
 
@@ -102,12 +119,30 @@ const MindMap = () => {
       id: `edge-${edges.length + 1}`,
       source: parentNode.id,
       target: newId,
-      style: { stroke: '#C8D5BB' },
+      style: { stroke: '#C8D5BB', opacity: 0.8 },
       animated: true,
     };
 
     setLocalNodes((nds) => [...nds, newNode]);
     setEdges((eds) => [...eds, newEdge]);
+
+    setTimeout(() => {
+      setLocalNodes((nds) =>
+        nds.map((node) =>
+          node.id === newId
+            ? {
+                ...node,
+                position,
+                style: {
+                  ...node.style,
+                  backgroundColor: getNodeColor(node),
+                  transition: 'all 0.5s ease-out',
+                },
+              }
+            : node
+        )
+      );
+    }, 50);
   }, [nodes, edges, setLocalNodes, setEdges]);
 
   const deleteNode = useCallback((nodeId: string) => {
@@ -115,6 +150,14 @@ const MindMap = () => {
     setLocalNodes((nds) => nds.filter((node) => node.id !== nodeId));
     setEdges((eds) => eds.filter((edge) => edge.source !== nodeId && edge.target !== nodeId));
   }, [setLocalNodes, setEdges]);
+
+  const handleRestart = useCallback(() => {
+    if (window.confirm('Are you sure you want to restart? This will clear your mind map.')) {
+      localStorage.removeItem('mindmap-nodes');
+      localStorage.removeItem('mindmap-edges');
+      navigate('/');
+    }
+  }, [navigate]);
 
   const MindMapNode = ({ id, data }: { id: string, data: any }) => (
     <div className="group relative">
@@ -155,11 +198,7 @@ const MindMap = () => {
         variant="ghost"
         size="icon"
         className="absolute top-4 left-4 z-50 bg-white/10 hover:bg-white/20 text-white"
-        onClick={() => {
-          localStorage.removeItem('mindmap-nodes');
-          localStorage.removeItem('mindmap-edges');
-          navigate('/');
-        }}
+        onClick={handleRestart}
       >
         <RefreshCw className="h-4 w-4" />
       </Button>
