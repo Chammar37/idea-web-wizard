@@ -4,10 +4,12 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from 'lucide-react';
 import { useToast } from "@/components/ui/use-toast";
+import { useNavigate } from 'react-router-dom';
 
 export const MindMapInput = () => {
   const [topic, setTopic] = useState('');
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,11 +21,8 @@ export const MindMapInput = () => {
       });
       return;
     }
-    // Handle the topic submission here
-    toast({
-      title: "Topic received!",
-      description: "Creating your mind map for: " + topic,
-    });
+    
+    navigate('/mindmap', { state: { topic: topic.trim() } });
   };
 
   return (
