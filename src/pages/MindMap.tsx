@@ -1,3 +1,4 @@
+
 import { useCallback, useState, useEffect } from 'react';
 import {
   ReactFlow,
@@ -12,9 +13,10 @@ import {
   Position,
   useReactFlow,
   BackgroundVariant,
+  NodeResizer,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { PlusCircle, Trash2, RefreshCw } from "lucide-react";
+import { PlusCircle, Trash2, RefreshCw, Sun, Moon, Edit } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -23,6 +25,8 @@ const MindMap = () => {
   const navigate = useNavigate();
   const { setNodes } = useReactFlow();
   const topic = location.state?.topic || 'My Topic';
+  const [isDarkMode, setIsDarkMode] = useState(true);
+  const [editingNodeId, setEditingNodeId] = useState<string | null>(null);
 
   const initialNodes: Node[] = [
     {
@@ -50,26 +54,42 @@ const MindMap = () => {
   useEffect(() => {
     const savedNodes = localStorage.getItem('mindmap-nodes');
     const savedEdges = localStorage.getItem('mindmap-edges');
+    const savedTheme = localStorage.getItem('mindmap-theme');
     
     if (savedNodes && savedEdges) {
       setLocalNodes(JSON.parse(savedNodes));
       setEdges(JSON.parse(savedEdges));
+    }
+    if (savedTheme) {
+      setIsDarkMode(JSON.parse(savedTheme));
     }
   }, []);
 
   useEffect(() => {
     localStorage.setItem('mindmap-nodes', JSON.stringify(nodes));
     localStorage.setItem('mindmap-edges', JSON.stringify(edges));
-  }, [nodes, edges]);
+    localStorage.setItem('mindmap-theme', JSON.stringify(isDarkMode));
+  }, [nodes, edges, isDarkMode]);
 
   const onConnect = useCallback((params: any) => {
     setEdges((eds) => addEdge(params, eds));
   }, [setEdges]);
 
-  const getNodeColor = (node: Node) => {
-    if (node.id === 'center') return 'rgba(200, 213, 187, 0.8)';
-    
-    let currentNode = node;
+  const getNodeColor = (parentNode: Node) => {
+    // Define base colors for our layering system
+    const colors = [
+      'rgba(200, 213, 187, 0.8)', // Center node - green
+      'rgba(155, 135, 245, 0.8)', // First layer - purple
+      'rgba(242, 252, 226, 0.8)', // Second layer - soft green
+      'rgba(254, 198, 161, 0.8)', // Third layer - soft orange
+      'rgba(227, 183, 249, 0.8)', // Fourth layer - soft purple
+      'rgba(173, 216, 230, 0.8)', // Fifth layer - light blue
+      // Add more colors as needed...
+    ];
+
+    if (parentNode.id === 'center') return colors[1];
+
+    let currentNode = parentNode;
     let layer = 0;
     while (currentNode) {
       const parentEdge = edges.find(e => e.target === currentNode.id);
@@ -78,11 +98,7 @@ const MindMap = () => {
       currentNode = nodes.find(n => n.id === parentEdge.source)!;
     }
 
-    switch (layer) {
-      case 1: return 'rgba(155, 135, 245, 0.8)';
-      case 2: return 'rgba(242, 252, 226, 0.8)';
-      default: return 'rgba(254, 198, 161, 0.8)';
-    }
+    return colors[(layer + 1) % colors.length] || colors[colors.length - 1];
   };
 
   const addChildNode = useCallback((parentNode: Node) => {
@@ -104,7 +120,7 @@ const MindMap = () => {
       style: {
         width: 120,
         height: 50,
-        backgroundColor: 'rgba(159, 158, 161, 0.7)',
+        backgroundColor: getNodeColor(parentNode),
         border: '1px solid #9F9EA1',
         borderRadius: '12px',
         padding: '12px',
@@ -135,7 +151,6 @@ const MindMap = () => {
                 position,
                 style: {
                   ...node.style,
-                  backgroundColor: getNodeColor(node),
                   transition: 'all 0.5s ease-out',
                 },
               }
@@ -159,29 +174,68 @@ const MindMap = () => {
     }
   }, [navigate]);
 
+  const updateNodeText = useCallback((nodeId: string, newText: string) => {
+    setLocalNodes((nds) =>
+      nds.map((node) =>
+        node.id === nodeId
+          ? { ...node, data: { ...node.data, label: newText } }
+          : node
+      )
+    );
+    setEditingNodeId(null);
+  }, [setLocalNodes]);
+
   const MindMapNode = ({ id, data }: { id: string, data: any }) => (
     <div className="group relative">
-      <div className="min-w-[100px] px-4 py-2 text-nezu-500 font-light text-center">
-        {data.label}
-      </div>
+      <NodeResizer 
+        minWidth={100}
+        minHeight={40}
+        isVisible={true}
+      />
+      {editingNodeId === id ? (
+        <input
+          type="text"
+          defaultValue={data.label}
+          className="w-full px-2 py-1 text-sm bg-white/90 rounded border-none outline-none"
+          onBlur={(e) => updateNodeText(id, e.target.value)}
+          autoFocus
+          onKeyPress={(e) => {
+            if (e.key === 'Enter') {
+              updateNodeText(id, e.currentTarget.value);
+            }
+          }}
+        />
+      ) : (
+        <div className="min-w-[100px] px-4 py-2 text-nezu-500 font-light text-center">
+          {data.label}
+        </div>
+      )}
       
-      <div className="absolute -right-10 top-1/2 -translate-y-1/2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+      <div className="absolute -right-8 top-1/2 -translate-y-1/2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
         <Button
           size="icon"
           variant="ghost"
-          className="h-8 w-8 bg-white/80 hover:bg-white"
+          className="h-6 w-6 bg-white/80 hover:bg-white"
+          onClick={() => setEditingNodeId(id)}
+        >
+          <Edit className="h-3 w-3 text-nezu-400" />
+        </Button>
+        <Button
+          size="icon"
+          variant="ghost"
+          className="h-6 w-6 bg-white/80 hover:bg-white"
           onClick={() => addChildNode(nodes.find(n => n.id === id)!)}
         >
-          <PlusCircle className="h-4 w-4 text-nezu-400" />
+          <PlusCircle className="h-3 w-3 text-nezu-400" />
         </Button>
         {id !== 'center' && (
           <Button
             size="icon"
             variant="ghost"
-            className="h-8 w-8 bg-white/80 hover:bg-white"
+            className="h-6 w-6 bg-white/80 hover:bg-white"
             onClick={() => deleteNode(id)}
           >
-            <Trash2 className="h-4 w-4 text-nezu-400" />
+            <Trash2 className="h-3 w-3 text-nezu-400" />
           </Button>
         )}
       </div>
@@ -193,15 +247,29 @@ const MindMap = () => {
   };
 
   return (
-    <div className="w-screen h-screen bg-[#221F26]">
-      <Button
-        variant="ghost"
-        size="icon"
-        className="absolute top-4 left-4 z-50 bg-white/10 hover:bg-white/20 text-white"
-        onClick={handleRestart}
-      >
-        <RefreshCw className="h-4 w-4" />
-      </Button>
+    <div className={`w-screen h-screen ${isDarkMode ? 'bg-[#221F26]' : 'bg-[#f3f3f3]'}`}>
+      <div className="absolute top-4 left-4 z-50 flex gap-2">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="bg-white/10 hover:bg-white/20 text-white"
+          onClick={handleRestart}
+        >
+          <RefreshCw className="h-4 w-4" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="bg-white/10 hover:bg-white/20 text-white"
+          onClick={() => setIsDarkMode(!isDarkMode)}
+        >
+          {isDarkMode ? (
+            <Sun className="h-4 w-4" />
+          ) : (
+            <Moon className="h-4 w-4" />
+          )}
+        </Button>
+      </div>
 
       <ReactFlow
         nodes={nodes}
@@ -214,31 +282,19 @@ const MindMap = () => {
         minZoom={0.5}
         maxZoom={2}
         fitView
-        className="bg-[#221F26]"
+        className={isDarkMode ? 'bg-[#221F26]' : 'bg-[#f3f3f3]'}
       >
         <Controls className="bg-white/80 border border-nezumi-300/20 rounded-lg" />
         <MiniMap 
-          className="bg-white/10 border border-white/20 rounded-lg" 
+          className={isDarkMode ? 'bg-white/10 border border-white/20' : 'bg-black/5 border border-black/10'} 
           nodeColor="#C8D5BB"
-          maskColor="rgba(34, 31, 38, 0.8)"
+          maskColor={isDarkMode ? "rgba(34, 31, 38, 0.8)" : "rgba(243, 243, 243, 0.8)"}
         />
-        <Background color="#FFFFFF" variant={BackgroundVariant.Dots} />
+        <Background 
+          color={isDarkMode ? "#FFFFFF" : "#000000"} 
+          variant={BackgroundVariant.Dots} 
+        />
       </ReactFlow>
-
-      <style>
-        {`
-          @keyframes spawn {
-            0% {
-              transform: scale(0);
-              opacity: 0;
-            }
-            100% {
-              transform: scale(1);
-              opacity: 1;
-            }
-          }
-        `}
-      </style>
     </div>
   );
 };
