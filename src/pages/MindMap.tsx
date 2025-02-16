@@ -187,16 +187,11 @@ const MindMap = () => {
 
   const MindMapNode = ({ id, data }: { id: string, data: any }) => (
     <div className="group relative">
-      <NodeResizer 
-        minWidth={100}
-        minHeight={40}
-        isVisible={true}
-      />
       {editingNodeId === id ? (
         <input
           type="text"
           defaultValue={data.label}
-          className="w-full px-2 py-1 text-sm bg-white/90 rounded border-none outline-none"
+          className="w-full px-2 py-1 text-sm bg-transparent text-nezu-500 border-none outline-none"
           onBlur={(e) => updateNodeText(id, e.target.value)}
           autoFocus
           onKeyPress={(e) => {
@@ -206,39 +201,47 @@ const MindMap = () => {
           }}
         />
       ) : (
-        <div className="min-w-[100px] px-4 py-2 text-nezu-500 font-light text-center">
+        <div className="min-w-[100px] px-4 py-2 text-nezu-500 font-light text-center cursor-move">
           {data.label}
         </div>
       )}
       
-      <div className="absolute -right-8 top-1/2 -translate-y-1/2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+      <div className="absolute -right-6 top-1/2 -translate-y-1/2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
         <Button
           size="icon"
           variant="ghost"
-          className="h-6 w-6 bg-white/80 hover:bg-white"
+          className="h-4 w-4 bg-white/80 hover:bg-white"
           onClick={() => setEditingNodeId(id)}
         >
-          <Edit className="h-3 w-3 text-nezu-400" />
+          <Edit className="h-2 w-2 text-nezu-400" />
         </Button>
         <Button
           size="icon"
           variant="ghost"
-          className="h-6 w-6 bg-white/80 hover:bg-white"
+          className="h-4 w-4 bg-white/80 hover:bg-white"
           onClick={() => addChildNode(nodes.find(n => n.id === id)!)}
         >
-          <PlusCircle className="h-3 w-3 text-nezu-400" />
+          <PlusCircle className="h-2 w-2 text-nezu-400" />
         </Button>
         {id !== 'center' && (
           <Button
             size="icon"
             variant="ghost"
-            className="h-6 w-6 bg-white/80 hover:bg-white"
+            className="h-4 w-4 bg-white/80 hover:bg-white"
             onClick={() => deleteNode(id)}
           >
-            <Trash2 className="h-3 w-3 text-nezu-400" />
+            <Trash2 className="h-2 w-2 text-nezu-400" />
           </Button>
         )}
       </div>
+      <div 
+        className="absolute inset-0 cursor-nw-resize"
+        style={{ 
+          cursor: 'nw-resize',
+          pointerEvents: 'none',
+          opacity: 0
+        }}
+      />
     </div>
   );
 
