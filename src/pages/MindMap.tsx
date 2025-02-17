@@ -175,14 +175,21 @@ const MindMap = () => {
         justifyContent: 'center',
         opacity: 0.9,
       },
+      data: {
+        ...parentNode.data,
+        handles: [
+          { id: 'left', type: 'target', position: Position.Left, style: handleStyle },
+          { id: 'right', type: 'source', position: Position.Right, style: handleStyle },
+        ],
+      },
     };
 
     const newEdge: Edge = {
       id: `edge-${edges.length + 1}`,
       source: parentNode.id,
       target: newId,
-      sourceHandle: 'right',
-      targetHandle: 'left',
+      source: parentNode.id,
+      target: newId,
       type: 'smoothstep',
       style: { stroke: '#C8D5BB', strokeWidth: 2 },
       animated: true,
@@ -279,8 +286,16 @@ const MindMap = () => {
     );
   };
 
+  // Define nodeTypes outside component
   const nodeTypes = {
     mindMap: MindMapNode,
+  };
+
+  const handleStyle = {
+    width: 10,
+    height: 10,
+    backgroundColor: '#C8D5BB',
+    border: '1px solid #9F9EA1',
   };
 
   return (
