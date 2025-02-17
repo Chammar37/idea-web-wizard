@@ -203,13 +203,13 @@ const MindMap = () => {
     if (!connectionExists) {
       setEdges((eds) => addEdge({
         ...params,
-        type: 'smoothstep',
+        type: 'bezier',
         style: { 
           stroke: '#47585C',
-          strokeWidth: 1.5,
-          opacity: 0.6,
+          strokeWidth: 2,
+          opacity: 0.8,
         },
-        animated: true
+        animated: false
       }, eds));
     }
   }, [edges, setEdges]);
@@ -238,27 +238,43 @@ const MindMap = () => {
     return colors[colorIndex];
   };
 
+  const determineHandlePositions = (parentPos: { x: number, y: number }, childPos: { x: number, y: number }) => {
+    const dx = childPos.x - parentPos.x;
+    const dy = childPos.y - parentPos.y;
+    
+    const parentHandle = Math.abs(dy) > Math.abs(dx) 
+      ? (dy > 0 ? Position.Bottom : Position.Top)
+      : (dx > 0 ? Position.Right : Position.Left);
+    
+    const childHandle = Math.abs(dy) > Math.abs(dx)
+      ? (dy > 0 ? Position.Top : Position.Bottom)
+      : (dx > 0 ? Position.Left : Position.Right);
+    
+    return { parentHandle, childHandle };
+  };
+
   const addChildNode = useCallback((parentNode: Node) => {
     const newId = `node-${nodes.length + 1}`;
     const parentPosition = parentNode.position;
-    const angle = Math.random() * 2 * Math.PI;
-    const distance = 200;
-
+    const distance = 150;
+    
     const position = {
-      x: parentPosition.x + Math.cos(angle) * distance,
-      y: parentPosition.y + Math.sin(angle) * distance,
+      x: parentPosition.x,
+      y: parentPosition.y + distance,
     };
+
+    const { parentHandle, childHandle } = determineHandlePositions(parentPosition, position);
 
     const newNode: Node = {
       id: newId,
       type: 'mindMap',
       data: { label: 'New Idea' },
       position: position,
-      sourcePosition: Position.Right,
-      targetPosition: Position.Left,
+      sourcePosition: parentHandle,
+      targetPosition: childHandle,
       style: {
-        width: 120,
-        height: 50,
+        width: 150,
+        height: 60,
         backgroundColor: getNodeColor(parentNode),
         border: '1px solid #9F9EA1',
         borderRadius: '12px',
@@ -274,9 +290,13 @@ const MindMap = () => {
       id: `edge-${edges.length + 1}`,
       source: parentNode.id,
       target: newId,
-      type: 'smoothstep',
-      style: { stroke: '#47585C', strokeWidth: 1.5, opacity: 0.6 },
-      animated: true,
+      type: 'bezier',
+      style: { 
+        stroke: '#47585C', 
+        strokeWidth: 2,
+        opacity: 0.8,
+      },
+      animated: false,
     };
 
     setLocalNodes((nds) => [...nds, newNode]);
