@@ -1,5 +1,4 @@
-
-import { useCallback, useState, useEffect } from 'react';
+import { useCallback, useState, useEffect, createContext, useContext } from 'react';
 import {
   ReactFlow,
   MiniMap,
@@ -61,6 +60,60 @@ const NodeOptions = ({ onEdit, onAdd, onDelete, show }: {
 
 const MindMapContext = createContext<any>(null);
 
+const handleStyle = {
+  width: 10,
+  height: 10,
+  backgroundColor: '#C8D5BB',
+  border: '1px solid #9F9EA1',
+};
+
+const MindMapNode = ({ id, data }: { id: string, data: any }) => {
+  const [showOptions, setShowOptions] = useState(false);
+  const { editingNodeId, setEditingNodeId, updateNodeText, addChildNode, deleteNode, nodes } = useContext(MindMapContext);
+
+  const handleMouseInteraction = useCallback((show: boolean) => {
+    setShowOptions(show);
+  }, []);
+
+  return (
+    <div 
+      className="relative w-full h-full cursor-move"
+      onMouseEnter={() => handleMouseInteraction(true)}
+      onMouseLeave={() => handleMouseInteraction(false)}
+    >
+      <div className="w-full h-full">
+        {editingNodeId === id ? (
+          <input
+            type="text"
+            defaultValue={data.label}
+            className="w-full px-2 py-1 text-sm bg-transparent text-nezu-500 border-none outline-none"
+            onBlur={(e) => updateNodeText(id, e.target.value)}
+            autoFocus
+            onKeyPress={(e) => {
+              if (e.key === 'Enter') {
+                updateNodeText(id, e.currentTarget.value);
+              }
+            }}
+          />
+        ) : (
+          <div className="w-full h-full px-4 py-2 text-nezu-500 font-light text-center cursor-move flex items-center justify-center">
+            {data.label}
+          </div>
+        )}
+
+        <div className="absolute -top-1 -right-1">
+          <NodeOptions 
+            show={showOptions}
+            onEdit={() => setEditingNodeId(id)}
+            onAdd={() => addChildNode(nodes.find(n => n.id === id)!)}
+            onDelete={() => id !== 'center' && deleteNode(id)}
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const nodeTypes = {
   mindMap: MindMapNode,
 };
@@ -102,7 +155,7 @@ const MindMap = () => {
     const savedNodes = localStorage.getItem('mindmap-nodes');
     const savedEdges = localStorage.getItem('mindmap-edges');
     const savedTheme = localStorage.getItem('mindmap-theme');
-    
+
     if (savedNodes && savedEdges) {
       setLocalNodes(JSON.parse(savedNodes));
       setEdges(JSON.parse(savedEdges));
@@ -151,17 +204,17 @@ const MindMap = () => {
     const parentPosition = parentNode.position;
     const angle = Math.random() * 2 * Math.PI;
     const distance = 200;
-    
+
     const position = {
       x: parentPosition.x + Math.cos(angle) * distance,
       y: parentPosition.y + Math.sin(angle) * distance,
     };
-    
+
     const newNode: Node = {
       id: newId,
       type: 'mindMap',
       data: { label: 'New Idea' },
-      position: parentPosition,
+      position: position,
       sourcePosition: Position.Right,
       targetPosition: Position.Left,
       style: {
@@ -176,13 +229,6 @@ const MindMap = () => {
         justifyContent: 'center',
         opacity: 0.9,
       },
-      data: {
-        ...parentNode.data,
-        handles: [
-          { id: 'left', type: 'target', position: Position.Left, style: handleStyle },
-          { id: 'right', type: 'source', position: Position.Right, style: handleStyle },
-        ],
-      },
     };
 
     const newEdge: Edge = {
@@ -196,23 +242,6 @@ const MindMap = () => {
 
     setLocalNodes((nds) => [...nds, newNode]);
     setEdges((eds) => [...eds, newEdge]);
-
-    setTimeout(() => {
-      setLocalNodes((nds) =>
-        nds.map((node) =>
-          node.id === newId
-            ? {
-                ...node,
-                position,
-                style: {
-                  ...node.style,
-                  transition: 'all 0.5s ease-out',
-                },
-              }
-            : node
-        )
-      );
-    }, 50);
   }, [nodes, edges, setLocalNodes, setEdges]);
 
   const deleteNode = useCallback((nodeId: string) => {
@@ -239,74 +268,6 @@ const MindMap = () => {
     );
     setEditingNodeId(null);
   }, [setLocalNodes]);
-
-  };
-
-const handleStyle = {
-  width: 10,
-  height: 10,
-  backgroundColor: '#C8D5BB',
-  border: '1px solid #9F9EA1',
-};
-
-const MindMapNode = ({ id, data }: { id: string, data: any }) => {
-  const [showOptions, setShowOptions] = useState(false);
-  const { editingNodeId, setEditingNodeId, updateNodeText, addChildNode, deleteNode, nodes } = useContext(MindMapContext);
-  
-  const handleMouseInteraction = useCallback((show: boolean) => {
-    setShowOptions(show);
-  }, []);
-
-  return (
-    <div 
-      className="relative w-full h-full cursor-move"
-      onMouseEnter={() => handleMouseInteraction(true)}
-      onMouseLeave={() => handleMouseInteraction(false)}
-    >
-      <div className="w-full h-full">
-        {editingNodeId === id ? (
-            <input
-              type="text"
-              defaultValue={data.label}
-              className="w-full px-2 py-1 text-sm bg-transparent text-nezu-500 border-none outline-none"
-              onBlur={(e) => updateNodeText(id, e.target.value)}
-              autoFocus
-              onKeyPress={(e) => {
-                if (e.key === 'Enter') {
-                  updateNodeText(id, e.currentTarget.value);
-                }
-              }}
-            />
-          ) : (
-            <div className="w-full h-full px-4 py-2 text-nezu-500 font-light text-center cursor-move flex items-center justify-center">
-              {data.label}
-            </div>
-          )}
-          
-          <div className="absolute -top-1 -right-1">
-            <NodeOptions 
-              show={showOptions}
-              onEdit={() => setEditingNodeId(id)}
-              onAdd={() => addChildNode(nodes.find(n => n.id === id)!)}
-              onDelete={() => id !== 'center' && deleteNode(id)}
-            />
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  // Define nodeTypes outside component
-  const nodeTypes = {
-    mindMap: MindMapNode,
-  };
-
-  const handleStyle = {
-    width: 10,
-    height: 10,
-    backgroundColor: '#C8D5BB',
-    border: '1px solid #9F9EA1',
-  };
 
   return (
     <div className={`w-screen h-screen ${isDarkMode ? 'bg-[#221F26]' : 'bg-[#f3f3f3]'}`}>
@@ -337,27 +298,27 @@ const MindMapNode = ({ id, data }: { id: string, data: any }) => {
         <ReactFlow
           nodes={nodes}
           edges={edges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        onConnect={onConnect}
-        nodeTypes={nodeTypes}
-        defaultViewport={{ x: 0, y: 0, zoom: 1.5 }}
-        minZoom={0.5}
-        maxZoom={2}
-        fitView
-        className={isDarkMode ? 'bg-[#221F26]' : 'bg-[#f3f3f3]'}
-      >
-        <Controls className="bg-white/80 border border-nezumi-300/20 rounded-lg" />
-        <MiniMap 
-          className={isDarkMode ? 'bg-white/10 border border-white/20' : 'bg-black/5 border border-black/10'} 
-          nodeColor="#C8D5BB"
-          maskColor={isDarkMode ? "rgba(34, 31, 38, 0.8)" : "rgba(243, 243, 243, 0.8)"}
-        />
-        <Background 
-          color={isDarkMode ? "#FFFFFF" : "#000000"} 
-          variant={BackgroundVariant.Dots} 
-        />
-      </ReactFlow>
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          onConnect={onConnect}
+          nodeTypes={nodeTypes}
+          defaultViewport={{ x: 0, y: 0, zoom: 1.5 }}
+          minZoom={0.5}
+          maxZoom={2}
+          fitView
+          className={isDarkMode ? 'bg-[#221F26]' : 'bg-[#f3f3f3]'}
+        >
+          <Controls className="bg-white/80 border border-nezumi-300/20 rounded-lg" />
+          <MiniMap 
+            className={isDarkMode ? 'bg-white/10 border border-white/20' : 'bg-black/5 border border-black/10'} 
+            nodeColor="#C8D5BB"
+            maskColor={isDarkMode ? "rgba(34, 31, 38, 0.8)" : "rgba(243, 243, 243, 0.8)"}
+          />
+          <Background 
+            color={isDarkMode ? "#FFFFFF" : "#000000"} 
+            variant={BackgroundVariant.Dots} 
+          />
+        </ReactFlow>
       </MindMapContext.Provider>
     </div>
   );
