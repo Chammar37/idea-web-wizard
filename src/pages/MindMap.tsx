@@ -1,3 +1,4 @@
+
 import { useCallback, useState, useEffect } from 'react';
 import {
   ReactFlow,
@@ -72,6 +73,8 @@ const MindMap = () => {
       type: 'mindMap',
       data: { label: topic },
       position: { x: 0, y: 0 },
+      sourcePosition: Position.Right,
+      targetPosition: Position.Left,
       style: {
         width: 150,
         height: 60,
@@ -153,6 +156,8 @@ const MindMap = () => {
       type: 'mindMap',
       data: { label: 'New Idea' },
       position: parentPosition,
+      sourcePosition: Position.Right,
+      targetPosition: Position.Left,
       style: {
         width: 120,
         height: 50,
@@ -171,7 +176,8 @@ const MindMap = () => {
       id: `edge-${edges.length + 1}`,
       source: parentNode.id,
       target: newId,
-      style: { stroke: '#C8D5BB', opacity: 0.8 },
+      type: 'smoothstep',
+      style: { stroke: '#C8D5BB', strokeWidth: 2 },
       animated: true,
     };
 
@@ -226,7 +232,7 @@ const MindMap = () => {
 
     return (
       <div 
-        className="group relative"
+        className="group w-full h-full"
         onMouseEnter={() => setShowOptions(true)}
         onMouseLeave={() => setShowOptions(false)}
       >
@@ -244,12 +250,12 @@ const MindMap = () => {
             }}
           />
         ) : (
-          <div className="min-w-[100px] px-4 py-2 text-nezu-500 font-light text-center cursor-move">
+          <div className="w-full h-full px-4 py-2 text-nezu-500 font-light text-center cursor-move flex items-center justify-center">
             {data.label}
           </div>
         )}
         
-        <div className="absolute -right-8 top-1/2 -translate-y-1/2">
+        <div className="absolute -top-2 -right-2">
           <NodeOptions 
             show={showOptions}
             onEdit={() => setEditingNodeId(id)}
