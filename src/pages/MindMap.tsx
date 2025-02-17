@@ -84,14 +84,9 @@ const MindMapNode = ({ id, data }: { id: string, data: any }) => {
     >
       <div className="w-full h-full">
         <Handle 
-          type="target" 
-          position={Position.Left} 
-          className="w-2.5 h-2.5 !bg-nezu-400/80 hover:!bg-nezu-500/90 !border-2 !border-nezumi-300/40" 
-        />
-        <Handle 
           type="source" 
-          position={Position.Right} 
-          className="w-2.5 h-2.5 !bg-nezu-400/80 hover:!bg-nezu-500/90 !border-2 !border-nezumi-300/40" 
+          position={Position.Bottom}
+          className="w-2.5 h-2.5 !bg-nezu-400/80 hover:!bg-nezu-500/90 !border-2 !border-nezumi-300/40 left-1/2 -translate-x-1/2"
         />
         {editingNodeId === id ? (
           <input
@@ -117,7 +112,7 @@ const MindMapNode = ({ id, data }: { id: string, data: any }) => {
             show={showOptions}
             onEdit={() => setEditingNodeId(id)}
             onAdd={() => addChildNode(nodes.find(n => n.id === id)!)}
-            onDelete={() => id !== 'center' && deleteNode(id)}
+            onDelete={() => deleteNode(id)}
           />
         </div>
       </div>
@@ -183,21 +178,33 @@ const MindMap = () => {
   }, [nodes, edges, isDarkMode]);
 
   const onConnect = useCallback((params: any) => {
-    setEdges((eds) => addEdge(params, eds));
-  }, [setEdges]);
+    // Check if connection already exists
+    const connectionExists = edges.some(
+      edge => edge.source === params.source && edge.target === params.target
+    );
+    
+    if (!connectionExists) {
+      setEdges((eds) => addEdge({
+        ...params,
+        type: 'default',
+        style: { 
+          stroke: '#47585C',
+          strokeWidth: 1.5,
+          opacity: 0.6,
+          strokeDasharray: '5 5',
+        },
+        animated: true
+      }, eds));
+    }
+  }, [edges, setEdges]);
 
   const getNodeColor = (parentNode: Node) => {
-    const colors = [
-      'rgba(200, 213, 187, 0.8)',
-      'rgba(155, 135, 245, 0.8)',
-      'rgba(242, 252, 226, 0.8)',
-      'rgba(254, 198, 161, 0.8)',
-      'rgba(227, 183, 249, 0.8)',
-      'rgba(173, 216, 230, 0.8)',
-    ];
+    // Source node (center) has a distinct color
+    if (parentNode.id === 'center') {
+      return 'rgba(155, 135, 245, 0.9)';
+    }
 
-    if (parentNode.id === 'center') return colors[1];
-
+    // Calculate the layer depth
     let currentNode = parentNode;
     let layer = 0;
     while (currentNode) {
@@ -207,7 +214,16 @@ const MindMap = () => {
       currentNode = nodes.find(n => n.id === parentEdge.source)!;
     }
 
-    return colors[(layer + 1) % colors.length] || colors[colors.length - 1];
+    // Colors get progressively more muted with each layer
+    const colors = [
+      'rgba(200, 183, 249, 0.85)',  // Layer 1: Muted purple
+      'rgba(173, 216, 230, 0.8)',   // Layer 2: Soft blue
+      'rgba(200, 213, 187, 0.75)',  // Layer 3: Pale green
+      'rgba(254, 198, 161, 0.7)',   // Layer 4: Soft orange
+      'rgba(220, 220, 220, 0.65)',  // Layer 5+: Very muted grey
+    ];
+
+    return colors[Math.min(layer - 1, colors.length - 1)];
   };
 
   const addChildNode = useCallback((parentNode: Node) => {
