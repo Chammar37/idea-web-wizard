@@ -4,7 +4,6 @@ import {
   useEffect,
   createContext,
   useContext,
-  useRef,
 } from "react";
 import {
   ReactFlow,
@@ -19,10 +18,9 @@ import {
   Position,
   useReactFlow,
   BackgroundVariant,
-  Handle,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { PlusCircle, Trash2, RefreshCw, Sun, Moon, Edit } from "lucide-react";
+import { PlusCircle, Trash2, RefreshCw, Sun, Moon, Edit, Palette } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -32,27 +30,37 @@ const NodeOptions = ({
   onAdd,
   onDelete,
   show,
-  setShowColorPicker,
+  setNodeColor,
 }: {
   onEdit: () => void;
   onAdd: () => void;
   onDelete: () => void;
   show: boolean;
-  setShowColorPicker: (show: boolean) => void;
+  setNodeColor: (color: string) => void;
 }) => {
+  const [showColorPicker, setShowColorPicker] = useState(false);
+  
+  const colors = [
+    "rgba(200, 213, 187, 0.8)", // soft green
+    "rgba(155, 135, 245, 0.8)", // purple
+    "rgba(254, 198, 161, 0.8)", // soft orange
+    "rgba(227, 183, 249, 0.8)", // soft purple
+    "rgba(173, 216, 230, 0.8)", // light blue
+  ];
+
   const icons = [
     { id: 1, icon: <Edit className="h-3 w-3" />, action: onEdit },
     { id: 2, icon: <PlusCircle className="h-3 w-3" />, action: onAdd },
     { id: 3, icon: <Trash2 className="h-3 w-3" />, action: onDelete },
-    { id: 4, icon: <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 2v20M2 12h20"/></svg>, action: () => setShowColorPicker(prev => !prev) },
+    { id: 4, icon: <Palette className="h-3 w-3" />, action: () => setShowColorPicker(prev => !prev) },
   ];
 
   const radius = 30;
 
   return (
-    <AnimatePresence>
-      {show &&
-        icons.map((item, index) => {
+    <>
+      <AnimatePresence>
+        {show && icons.map((item, index) => {
           const angle = (index / (icons.length - 1)) * Math.PI * 0.5;
           const x = Math.cos(angle) * radius;
           const y = -Math.sin(angle) * radius;
@@ -71,7 +79,31 @@ const NodeOptions = ({
             </motion.button>
           );
         })}
-    </AnimatePresence>
+      </AnimatePresence>
+      
+      <AnimatePresence>
+        {showColorPicker && show && (
+          <motion.div 
+            className="absolute left-full ml-2 top-0 bg-white/90 p-2 rounded-lg shadow-sm flex gap-2"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+          >
+            {colors.map((color, index) => (
+              <button
+                key={index}
+                className="w-6 h-6 rounded-full shadow-sm transition-transform hover:scale-110"
+                style={{ backgroundColor: color }}
+                onClick={() => {
+                  setNodeColor(color);
+                  setShowColorPicker(false);
+                }}
+              />
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 };
 
@@ -86,7 +118,6 @@ const handleStyle = {
 
 const MindMapNode = ({ id, data }: { id: string; data: any }) => {
   const [showOptions, setShowOptions] = useState(false);
-  const [showColorPicker, setShowColorPicker] = useState(false);
   const {
     editingNodeId,
     setEditingNodeId,
@@ -94,6 +125,7 @@ const MindMapNode = ({ id, data }: { id: string; data: any }) => {
     addChildNode,
     deleteNode,
     nodes,
+    updateNodeColor,
   } = useContext(MindMapContext);
   const [nodeWidth, setNodeWidth] = useState(150);
   const textRef = useRef<HTMLDivElement>(null);
@@ -155,7 +187,7 @@ const MindMapNode = ({ id, data }: { id: string; data: any }) => {
             onEdit={() => setEditingNodeId(id)}
             onAdd={() => addChildNode(nodes.find((n) => n.id === id)!)}
             onDelete={() => deleteNode(id)}
-            setShowColorPicker={setShowColorPicker}
+            setNodeColor={(color) => updateNodeColor(id, color)}
           />
         </div>
       </div>
@@ -399,6 +431,25 @@ const MindMap = () => {
     [setLocalNodes],
   );
 
+  const updateNodeColor = useCallback(
+    (nodeId: string, color: string) => {
+      setLocalNodes((nds) =>
+        nds.map((node) =>
+          node.id === nodeId
+            ? {
+                ...node,
+                style: {
+                  ...node.style,
+                  backgroundColor: color,
+                },
+              }
+            : node
+        )
+      );
+    },
+    [setLocalNodes]
+  );
+
   return (
     <div
       className={`w-screen h-screen ${isDarkMode ? "bg-[#221F26]" : "bg-[#f3f3f3]"}`}
@@ -434,6 +485,7 @@ const MindMap = () => {
           addChildNode,
           deleteNode,
           nodes,
+          updateNodeColor,
         }}
       >
         <ReactFlow
