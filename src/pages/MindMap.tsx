@@ -82,9 +82,17 @@ const MindMapNode = ({ id, data }: { id: string, data: any }) => {
       onMouseEnter={() => handleMouseInteraction(true)}
       onMouseLeave={() => handleMouseInteraction(false)}
     >
-      <div className="nodrag w-full h-full">
-        <Handle type="target" position={Position.Left} className="w-2 h-2 !bg-nezumi-300/80" />
-        <Handle type="source" position={Position.Right} className="w-2 h-2 !bg-nezumi-300/80" />
+      <div className="w-full h-full">
+        <Handle 
+          type="target" 
+          position={Position.Left} 
+          className="w-2.5 h-2.5 !bg-nezu-400/80 hover:!bg-nezu-500/90 !border-2 !border-nezumi-300/40" 
+        />
+        <Handle 
+          type="source" 
+          position={Position.Right} 
+          className="w-2.5 h-2.5 !bg-nezu-400/80 hover:!bg-nezu-500/90 !border-2 !border-nezumi-300/40" 
+        />
         {editingNodeId === id ? (
           <input
             type="text"
@@ -239,7 +247,7 @@ const MindMap = () => {
       source: parentNode.id,
       target: newId,
       type: 'smoothstep',
-      style: { stroke: '#C8D5BB', strokeWidth: 2 },
+      style: { stroke: '#47585C', strokeWidth: 1.5, opacity: 0.6 },
       animated: true,
     };
 
