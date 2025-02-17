@@ -12,6 +12,7 @@ import {
   Position,
   useReactFlow,
   BackgroundVariant,
+  Handle,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { PlusCircle, Trash2, RefreshCw, Sun, Moon, Edit } from "lucide-react";
@@ -81,7 +82,9 @@ const MindMapNode = ({ id, data }: { id: string, data: any }) => {
       onMouseEnter={() => handleMouseInteraction(true)}
       onMouseLeave={() => handleMouseInteraction(false)}
     >
-      <div className="w-full h-full">
+      <div className="nodrag w-full h-full">
+        <Handle type="target" position={Position.Left} className="w-2 h-2 !bg-nezumi-300/80" />
+        <Handle type="source" position={Position.Right} className="w-2 h-2 !bg-nezumi-300/80" />
         {editingNodeId === id ? (
           <input
             type="text"
