@@ -1,0 +1,35 @@
+The above error occurred in the <MindMapNode> component:
+
+    at MindMapNode (https://cfdc7cf2-8bb3-4929-b40c-bb412ffe4e01-00-2l9sdrizt58ui.kirk.replit.dev/src/pages/MindMap.tsx:139:24)
+    at div
+    at NodeWrapper (https://cfdc7cf2-8bb3-4929-b40c-bb412ffe4e01-00-2l9sdrizt58ui.kirk.replit.dev/node_modules/.vite/deps/@xyflow_react.js?v=1c524ca7:7595:28)
+    at div
+    at NodeRendererComponent (https://cfdc7cf2-8bb3-4929-b40c-bb412ffe4e01-00-2l9sdrizt58ui.kirk.replit.dev/node_modules/.vite/deps/@xyflow_react.js?v=1c524ca7:7708:93)
+    at div
+    at Viewport (https://cfdc7cf2-8bb3-4929-b40c-bb412ffe4e01-00-2l9sdrizt58ui.kirk.replit.dev/node_modules/.vite/deps/@xyflow_react.js?v=1c524ca7:8177:31)
+    at div
+    at Pane (https://cfdc7cf2-8bb3-4929-b40c-bb412ffe4e01-00-2l9sdrizt58ui.kirk.replit.dev/node_modules/.vite/deps/@xyflow_react.js?v=1c524ca7:7050:17)
+    at div
+    at ZoomPane (https://cfdc7cf2-8bb3-4929-b40c-bb412ffe4e01-00-2l9sdrizt58ui.kirk.replit.dev/node_modules/.vite/deps/@xyflow_react.js?v=1c524ca7:6932:21)
+    at FlowRendererComponent (https://cfdc7cf2-8bb3-4929-b40c-bb412ffe4e01-00-2l9sdrizt58ui.kirk.replit.dev/node_modules/.vite/deps/@xyflow_react.js?v=1c524ca7:7508:44)
+    at GraphViewComponent (https://cfdc7cf2-8bb3-4929-b40c-bb412ffe4e01-00-2l9sdrizt58ui.kirk.replit.dev/node_modules/.vite/deps/@xyflow_react.js?v=1c524ca7:8311:31)
+    at Wrapper (https://cfdc7cf2-8bb3-4929-b40c-bb412ffe4e01-00-2l9sdrizt58ui.kirk.replit.dev/node_modules/.vite/deps/@xyflow_react.js?v=1c524ca7:8660:30)
+    at div
+    at ReactFlow (https://cfdc7cf2-8bb3-4929-b40c-bb412ffe4e01-00-2l9sdrizt58ui.kirk.replit.dev/node_modules/.vite/deps/@xyflow_react.js?v=1c524ca7:8674:22)
+    at div
+    at MindMap (https://cfdc7cf2-8bb3-4929-b40c-bb412ffe4e01-00-2l9sdrizt58ui.kirk.replit.dev/src/pages/MindMap.tsx:300:22)
+    at RenderedRoute (https://cfdc7cf2-8bb3-4929-b40c-bb412ffe4e01-00-2l9sdrizt58ui.kirk.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=1c524ca7:4069:5)
+    at Routes (https://cfdc7cf2-8bb3-4929-b40c-bb412ffe4e01-00-2l9sdrizt58ui.kirk.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=1c524ca7:4508:5)
+    at Router (https://cfdc7cf2-8bb3-4929-b40c-bb412ffe4e01-00-2l9sdrizt58ui.kirk.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=1c524ca7:4451:15)
+    at BrowserRouter (https://cfdc7cf2-8bb3-4929-b40c-bb412ffe4e01-00-2l9sdrizt58ui.kirk.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=1c524ca7:5196:5)
+    at BatchProvider (https://cfdc7cf2-8bb3-4929-b40c-bb412ffe4e01-00-2l9sdrizt58ui.kirk.replit.dev/node_modules/.vite/deps/@xyflow_react.js?v=1c524ca7:6660:36)
+    at ReactFlowProvider (https://cfdc7cf2-8bb3-4929-b40c-bb412ffe4e01-00-2l9sdrizt58ui.kirk.replit.dev/node_modules/.vite/deps/@xyflow_react.js?v=1c524ca7:8646:44)
+    at Provider (https://cfdc7cf2-8bb3-4929-b40c-bb412ffe4e01-00-2l9sdrizt58ui.kirk.replit.dev/node_modules/.vite/deps/chunk-G3IZPNZR.js?v=1c524ca7:39:15)
+    at TooltipProvider (https://cfdc7cf2-8bb3-4929-b40c-bb412ffe4e01-00-2l9sdrizt58ui.kirk.replit.dev/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=1c524ca7:2293:5)
+    at QueryClientProvider (https://cfdc7cf2-8bb3-4929-b40c-bb412ffe4e01-00-2l9sdrizt58ui.kirk.replit.dev/node_modules/.vite/deps/@tanstack_react-query.js?v=1c524ca7:2794:3)
+    at App
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+useRef is not defined
+[vite] connected.
