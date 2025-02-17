@@ -232,36 +232,38 @@ const MindMap = () => {
 
     return (
       <div 
-        className="group w-full h-full"
+        className="group w-full h-full relative"
         onMouseEnter={() => setShowOptions(true)}
         onMouseLeave={() => setShowOptions(false)}
       >
-        {editingNodeId === id ? (
-          <input
-            type="text"
-            defaultValue={data.label}
-            className="w-full px-2 py-1 text-sm bg-transparent text-nezu-500 border-none outline-none"
-            onBlur={(e) => updateNodeText(id, e.target.value)}
-            autoFocus
-            onKeyPress={(e) => {
-              if (e.key === 'Enter') {
-                updateNodeText(id, e.currentTarget.value);
-              }
-            }}
-          />
-        ) : (
-          <div className="w-full h-full px-4 py-2 text-nezu-500 font-light text-center cursor-move flex items-center justify-center">
-            {data.label}
+        <div className="absolute inset-0">
+          {editingNodeId === id ? (
+            <input
+              type="text"
+              defaultValue={data.label}
+              className="w-full px-2 py-1 text-sm bg-transparent text-nezu-500 border-none outline-none"
+              onBlur={(e) => updateNodeText(id, e.target.value)}
+              autoFocus
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') {
+                  updateNodeText(id, e.currentTarget.value);
+                }
+              }}
+            />
+          ) : (
+            <div className="w-full h-full px-4 py-2 text-nezu-500 font-light text-center cursor-move flex items-center justify-center">
+              {data.label}
+            </div>
+          )}
+          
+          <div className="absolute -top-1 -right-1">
+            <NodeOptions 
+              show={showOptions}
+              onEdit={() => setEditingNodeId(id)}
+              onAdd={() => addChildNode(nodes.find(n => n.id === id)!)}
+              onDelete={() => id !== 'center' && deleteNode(id)}
+            />
           </div>
-        )}
-        
-        <div className="absolute -top-2 -right-2">
-          <NodeOptions 
-            show={showOptions}
-            onEdit={() => setEditingNodeId(id)}
-            onAdd={() => addChildNode(nodes.find(n => n.id === id)!)}
-            onDelete={() => id !== 'center' && deleteNode(id)}
-          />
         </div>
       </div>
     );
