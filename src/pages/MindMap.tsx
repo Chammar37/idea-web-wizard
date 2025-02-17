@@ -158,6 +158,11 @@ const MindMap = () => {
       position: parentPosition,
       sourcePosition: Position.Right,
       targetPosition: Position.Left,
+      connectable: true,
+      handles: [
+        { type: 'target', position: Position.Left },
+        { type: 'source', position: Position.Right },
+      ],
       style: {
         width: 120,
         height: 50,
@@ -176,6 +181,8 @@ const MindMap = () => {
       id: `edge-${edges.length + 1}`,
       source: parentNode.id,
       target: newId,
+      sourceHandle: 'right',
+      targetHandle: 'left',
       type: 'smoothstep',
       style: { stroke: '#C8D5BB', strokeWidth: 2 },
       animated: true,
@@ -229,14 +236,17 @@ const MindMap = () => {
 
   const MindMapNode = ({ id, data }: { id: string, data: any }) => {
     const [showOptions, setShowOptions] = useState(false);
+    const handleMouseInteraction = useCallback((show: boolean) => {
+      setShowOptions(show);
+    }, []);
 
     return (
       <div 
-        className="group w-full h-full relative"
-        onMouseEnter={() => setShowOptions(true)}
-        onMouseLeave={() => setShowOptions(false)}
+        className="relative w-full h-full cursor-move"
+        onMouseEnter={() => handleMouseInteraction(true)}
+        onMouseLeave={() => handleMouseInteraction(false)}
       >
-        <div className="absolute inset-0">
+        <div className="w-full h-full">
           {editingNodeId === id ? (
             <input
               type="text"
