@@ -71,6 +71,15 @@ const handleStyle = {
 const MindMapNode = ({ id, data }: { id: string, data: any }) => {
   const [showOptions, setShowOptions] = useState(false);
   const { editingNodeId, setEditingNodeId, updateNodeText, addChildNode, deleteNode, nodes } = useContext(MindMapContext);
+  const [nodeWidth, setNodeWidth] = useState(150);
+  const textRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (textRef.current) {
+      const width = Math.max(150, textRef.current.scrollWidth + 48); // minimum 150px width
+      setNodeWidth(width);
+    }
+  }, [data.label]);
 
   const handleMouseInteraction = useCallback((show: boolean) => {
     setShowOptions(show);
@@ -78,21 +87,27 @@ const MindMapNode = ({ id, data }: { id: string, data: any }) => {
 
   return (
     <div 
-      className="relative w-full h-full cursor-move"
+      className="relative cursor-move"
+      style={{ width: nodeWidth }}
       onMouseEnter={() => handleMouseInteraction(true)}
       onMouseLeave={() => handleMouseInteraction(false)}
     >
-      <div className="w-full h-full">
+      <div className="relative flex flex-col items-center min-h-[50px]">
+        <Handle 
+          type="target"
+          position={Position.Top}
+          className="w-2 h-2 !bg-nezu-400/80 hover:!bg-nezu-500/90 !border !border-nezumi-300/40"
+        />
         <Handle 
           type="source" 
           position={Position.Bottom}
-          className="w-2.5 h-2.5 !bg-nezu-400/80 hover:!bg-nezu-500/90 !border-2 !border-nezumi-300/40 left-1/2 -translate-x-1/2"
+          className="w-2 h-2 !bg-nezu-400/80 hover:!bg-nezu-500/90 !border !border-nezumi-300/40"
         />
         {editingNodeId === id ? (
           <input
             type="text"
             defaultValue={data.label}
-            className="w-full px-2 py-1 text-sm bg-transparent text-nezu-500 border-none outline-none"
+            className="w-full px-3 py-2 text-sm bg-transparent text-nezu-500 border-none outline-none text-center"
             onBlur={(e) => updateNodeText(id, e.target.value)}
             autoFocus
             onKeyPress={(e) => {
@@ -102,7 +117,10 @@ const MindMapNode = ({ id, data }: { id: string, data: any }) => {
             }}
           />
         ) : (
-          <div className="w-full h-full px-4 py-2 text-nezu-500 font-light text-center cursor-move flex items-center justify-center">
+          <div 
+            ref={textRef}
+            className="w-full px-3 py-2 text-nezu-500 text-sm font-light text-center"
+          >
             {data.label}
           </div>
         )}
@@ -199,31 +217,20 @@ const MindMap = () => {
   }, [edges, setEdges]);
 
   const getNodeColor = (parentNode: Node) => {
-    // Source node (center) has a distinct color
     if (parentNode.id === 'center') {
       return 'rgba(155, 135, 245, 0.9)';
     }
 
-    // Calculate the layer depth
-    let currentNode = parentNode;
-    let layer = 0;
-    while (currentNode) {
-      const parentEdge = edges.find(e => e.target === currentNode.id);
-      if (!parentEdge) break;
-      layer++;
-      currentNode = nodes.find(n => n.id === parentEdge.source)!;
-    }
-
-    // Colors get progressively more muted with each layer
     const colors = [
-      'rgba(200, 183, 249, 0.85)',  // Layer 1: Muted purple
-      'rgba(173, 216, 230, 0.8)',   // Layer 2: Soft blue
-      'rgba(200, 213, 187, 0.75)',  // Layer 3: Pale green
-      'rgba(254, 198, 161, 0.7)',   // Layer 4: Soft orange
-      'rgba(220, 220, 220, 0.65)',  // Layer 5+: Very muted grey
+      'rgba(200, 183, 249, 0.85)',  // Purple
+      'rgba(173, 216, 230, 0.8)',   // Blue
+      'rgba(187, 213, 187, 0.8)',   // Green
+      'rgba(254, 198, 161, 0.8)',   // Orange
     ];
 
-    return colors[Math.min(layer - 1, colors.length - 1)];
+    // Use node ID to consistently pick a color
+    const colorIndex = parseInt(parentNode.id.replace(/\D/g, '')) % colors.length;
+    return colors[colorIndex];
   };
 
   const addChildNode = useCallback((parentNode: Node) => {
