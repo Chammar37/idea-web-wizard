@@ -196,7 +196,6 @@ const MindMap = () => {
   }, [nodes, edges, isDarkMode]);
 
   const onConnect = useCallback((params: any) => {
-    // Check if connection already exists
     const connectionExists = edges.some(
       edge => edge.source === params.source && edge.target === params.target
     );
@@ -204,17 +203,23 @@ const MindMap = () => {
     if (!connectionExists) {
       setEdges((eds) => addEdge({
         ...params,
-        type: 'default',
+        type: 'smoothstep',
         style: { 
           stroke: '#47585C',
           strokeWidth: 1.5,
           opacity: 0.6,
-          strokeDasharray: '5 5',
         },
         animated: true
       }, eds));
     }
   }, [edges, setEdges]);
+
+  const onEdgeClick = useCallback((event: React.MouseEvent, edge: Edge) => {
+    event.stopPropagation();
+    if (window.confirm('Do you want to remove this connection?')) {
+      setEdges((eds) => eds.filter((e) => e.id !== edge.id));
+    }
+  }, [setEdges]);
 
   const getNodeColor = (parentNode: Node) => {
     if (parentNode.id === 'center') {
@@ -335,6 +340,7 @@ const MindMap = () => {
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
+          onEdgeClick={onEdgeClick}
           nodeTypes={nodeTypes}
           defaultViewport={{ x: 0, y: 0, zoom: 1.5 }}
           minZoom={0.5}
