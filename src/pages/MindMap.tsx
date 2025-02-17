@@ -32,16 +32,19 @@ const NodeOptions = ({
   onAdd,
   onDelete,
   show,
+  setShowColorPicker,
 }: {
   onEdit: () => void;
   onAdd: () => void;
   onDelete: () => void;
   show: boolean;
+  setShowColorPicker: (show: boolean) => void;
 }) => {
   const icons = [
     { id: 1, icon: <Edit className="h-3 w-3" />, action: onEdit },
     { id: 2, icon: <PlusCircle className="h-3 w-3" />, action: onAdd },
     { id: 3, icon: <Trash2 className="h-3 w-3" />, action: onDelete },
+    { id: 4, icon: <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 2v20M2 12h20"/></svg>, action: () => setShowColorPicker(prev => !prev) },
   ];
 
   const radius = 30;
@@ -83,6 +86,7 @@ const handleStyle = {
 
 const MindMapNode = ({ id, data }: { id: string; data: any }) => {
   const [showOptions, setShowOptions] = useState(false);
+  const [showColorPicker, setShowColorPicker] = useState(false);
   const {
     editingNodeId,
     setEditingNodeId,
@@ -151,6 +155,7 @@ const MindMapNode = ({ id, data }: { id: string; data: any }) => {
             onEdit={() => setEditingNodeId(id)}
             onAdd={() => addChildNode(nodes.find((n) => n.id === id)!)}
             onDelete={() => deleteNode(id)}
+            setShowColorPicker={setShowColorPicker}
           />
         </div>
       </div>
