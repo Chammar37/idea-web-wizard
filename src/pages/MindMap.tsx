@@ -1,4 +1,3 @@
-
 import { useCallback, useState, useEffect } from 'react';
 import {
   ReactFlow,
@@ -13,12 +12,51 @@ import {
   Position,
   useReactFlow,
   BackgroundVariant,
-  NodeResizer,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { PlusCircle, Trash2, RefreshCw, Sun, Moon, Edit } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLocation, useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from "framer-motion";
+
+const NodeOptions = ({ onEdit, onAdd, onDelete, show }: { 
+  onEdit: () => void;
+  onAdd: () => void;
+  onDelete: () => void;
+  show: boolean;
+}) => {
+  const icons = [
+    { id: 1, icon: <Edit className="h-3 w-3" />, action: onEdit },
+    { id: 2, icon: <PlusCircle className="h-3 w-3" />, action: onAdd },
+    { id: 3, icon: <Trash2 className="h-3 w-3" />, action: onDelete },
+  ];
+
+  const radius = 30;
+
+  return (
+    <AnimatePresence>
+      {show && icons.map((item, index) => {
+        const angle = (index / (icons.length - 1)) * Math.PI * 0.5;
+        const x = Math.cos(angle) * radius;
+        const y = -Math.sin(angle) * radius;
+
+        return (
+          <motion.button
+            key={item.id}
+            className="absolute w-6 h-6 bg-white/90 hover:bg-white text-nezu-400 rounded-full flex items-center justify-center shadow-sm"
+            initial={{ x: 0, y: 0, opacity: 0 }}
+            animate={{ x, y, opacity: 1 }}
+            exit={{ x: 0, y: 0, opacity: 0 }}
+            transition={{ type: "spring", stiffness: 300, damping: 15 }}
+            onClick={item.action}
+          >
+            {item.icon}
+          </motion.button>
+        );
+      })}
+    </AnimatePresence>
+  );
+};
 
 const MindMap = () => {
   const location = useLocation();
@@ -76,15 +114,13 @@ const MindMap = () => {
   }, [setEdges]);
 
   const getNodeColor = (parentNode: Node) => {
-    // Define base colors for our layering system
     const colors = [
-      'rgba(200, 213, 187, 0.8)', // Center node - green
-      'rgba(155, 135, 245, 0.8)', // First layer - purple
-      'rgba(242, 252, 226, 0.8)', // Second layer - soft green
-      'rgba(254, 198, 161, 0.8)', // Third layer - soft orange
-      'rgba(227, 183, 249, 0.8)', // Fourth layer - soft purple
-      'rgba(173, 216, 230, 0.8)', // Fifth layer - light blue
-      // Add more colors as needed...
+      'rgba(200, 213, 187, 0.8)',
+      'rgba(155, 135, 245, 0.8)',
+      'rgba(242, 252, 226, 0.8)',
+      'rgba(254, 198, 161, 0.8)',
+      'rgba(227, 183, 249, 0.8)',
+      'rgba(173, 216, 230, 0.8)',
     ];
 
     if (parentNode.id === 'center') return colors[1];
@@ -185,65 +221,45 @@ const MindMap = () => {
     setEditingNodeId(null);
   }, [setLocalNodes]);
 
-  const MindMapNode = ({ id, data }: { id: string, data: any }) => (
-    <div className="group relative">
-      {editingNodeId === id ? (
-        <input
-          type="text"
-          defaultValue={data.label}
-          className="w-full px-2 py-1 text-sm bg-transparent text-nezu-500 border-none outline-none"
-          onBlur={(e) => updateNodeText(id, e.target.value)}
-          autoFocus
-          onKeyPress={(e) => {
-            if (e.key === 'Enter') {
-              updateNodeText(id, e.currentTarget.value);
-            }
-          }}
-        />
-      ) : (
-        <div className="min-w-[100px] px-4 py-2 text-nezu-500 font-light text-center cursor-move">
-          {data.label}
-        </div>
-      )}
-      
-      <div className="absolute -right-6 top-1/2 -translate-y-1/2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-        <Button
-          size="icon"
-          variant="ghost"
-          className="h-4 w-4 bg-white/80 hover:bg-white"
-          onClick={() => setEditingNodeId(id)}
-        >
-          <Edit className="h-2 w-2 text-nezu-400" />
-        </Button>
-        <Button
-          size="icon"
-          variant="ghost"
-          className="h-4 w-4 bg-white/80 hover:bg-white"
-          onClick={() => addChildNode(nodes.find(n => n.id === id)!)}
-        >
-          <PlusCircle className="h-2 w-2 text-nezu-400" />
-        </Button>
-        {id !== 'center' && (
-          <Button
-            size="icon"
-            variant="ghost"
-            className="h-4 w-4 bg-white/80 hover:bg-white"
-            onClick={() => deleteNode(id)}
-          >
-            <Trash2 className="h-2 w-2 text-nezu-400" />
-          </Button>
-        )}
-      </div>
+  const MindMapNode = ({ id, data }: { id: string, data: any }) => {
+    const [showOptions, setShowOptions] = useState(false);
+
+    return (
       <div 
-        className="absolute inset-0 cursor-nw-resize"
-        style={{ 
-          cursor: 'nw-resize',
-          pointerEvents: 'none',
-          opacity: 0
-        }}
-      />
-    </div>
-  );
+        className="group relative"
+        onMouseEnter={() => setShowOptions(true)}
+        onMouseLeave={() => setShowOptions(false)}
+      >
+        {editingNodeId === id ? (
+          <input
+            type="text"
+            defaultValue={data.label}
+            className="w-full px-2 py-1 text-sm bg-transparent text-nezu-500 border-none outline-none"
+            onBlur={(e) => updateNodeText(id, e.target.value)}
+            autoFocus
+            onKeyPress={(e) => {
+              if (e.key === 'Enter') {
+                updateNodeText(id, e.currentTarget.value);
+              }
+            }}
+          />
+        ) : (
+          <div className="min-w-[100px] px-4 py-2 text-nezu-500 font-light text-center cursor-move">
+            {data.label}
+          </div>
+        )}
+        
+        <div className="absolute -right-8 top-1/2 -translate-y-1/2">
+          <NodeOptions 
+            show={showOptions}
+            onEdit={() => setEditingNodeId(id)}
+            onAdd={() => addChildNode(nodes.find(n => n.id === id)!)}
+            onDelete={() => id !== 'center' && deleteNode(id)}
+          />
+        </div>
+      </div>
+    );
+  };
 
   const nodeTypes = {
     mindMap: MindMapNode,
@@ -255,7 +271,7 @@ const MindMap = () => {
         <Button
           variant="ghost"
           size="icon"
-          className="bg-white/10 hover:bg-white/20 text-white"
+          className={`${isDarkMode ? 'bg-white/10 hover:bg-white/20 text-white' : 'bg-black/10 hover:bg-black/20 text-black'}`}
           onClick={handleRestart}
         >
           <RefreshCw className="h-4 w-4" />
@@ -263,7 +279,7 @@ const MindMap = () => {
         <Button
           variant="ghost"
           size="icon"
-          className="bg-white/10 hover:bg-white/20 text-white"
+          className={`${isDarkMode ? 'bg-white/10 hover:bg-white/20 text-white' : 'bg-black/10 hover:bg-black/20 text-black'}`}
           onClick={() => setIsDarkMode(!isDarkMode)}
         >
           {isDarkMode ? (
