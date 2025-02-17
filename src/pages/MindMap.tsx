@@ -59,6 +59,12 @@ const NodeOptions = ({ onEdit, onAdd, onDelete, show }: {
   );
 };
 
+const MindMapContext = createContext<any>(null);
+
+const nodeTypes = {
+  mindMap: MindMapNode,
+};
+
 const MindMap = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -158,11 +164,6 @@ const MindMap = () => {
       position: parentPosition,
       sourcePosition: Position.Right,
       targetPosition: Position.Left,
-      connectable: true,
-      handles: [
-        { type: 'target', position: Position.Left },
-        { type: 'source', position: Position.Right },
-      ],
       style: {
         width: 120,
         height: 50,
@@ -186,8 +187,6 @@ const MindMap = () => {
 
     const newEdge: Edge = {
       id: `edge-${edges.length + 1}`,
-      source: parentNode.id,
-      target: newId,
       source: parentNode.id,
       target: newId,
       type: 'smoothstep',
@@ -241,20 +240,31 @@ const MindMap = () => {
     setEditingNodeId(null);
   }, [setLocalNodes]);
 
-  const MindMapNode = ({ id, data }: { id: string, data: any }) => {
-    const [showOptions, setShowOptions] = useState(false);
-    const handleMouseInteraction = useCallback((show: boolean) => {
-      setShowOptions(show);
-    }, []);
+  };
 
-    return (
-      <div 
-        className="relative w-full h-full cursor-move"
-        onMouseEnter={() => handleMouseInteraction(true)}
-        onMouseLeave={() => handleMouseInteraction(false)}
-      >
-        <div className="w-full h-full">
-          {editingNodeId === id ? (
+const handleStyle = {
+  width: 10,
+  height: 10,
+  backgroundColor: '#C8D5BB',
+  border: '1px solid #9F9EA1',
+};
+
+const MindMapNode = ({ id, data }: { id: string, data: any }) => {
+  const [showOptions, setShowOptions] = useState(false);
+  const { editingNodeId, setEditingNodeId, updateNodeText, addChildNode, deleteNode, nodes } = useContext(MindMapContext);
+  
+  const handleMouseInteraction = useCallback((show: boolean) => {
+    setShowOptions(show);
+  }, []);
+
+  return (
+    <div 
+      className="relative w-full h-full cursor-move"
+      onMouseEnter={() => handleMouseInteraction(true)}
+      onMouseLeave={() => handleMouseInteraction(false)}
+    >
+      <div className="w-full h-full">
+        {editingNodeId === id ? (
             <input
               type="text"
               defaultValue={data.label}
@@ -323,9 +333,10 @@ const MindMap = () => {
         </Button>
       </div>
 
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
+      <MindMapContext.Provider value={{ editingNodeId, setEditingNodeId, updateNodeText, addChildNode, deleteNode, nodes }}>
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
@@ -347,6 +358,7 @@ const MindMap = () => {
           variant={BackgroundVariant.Dots} 
         />
       </ReactFlow>
+      </MindMapContext.Provider>
     </div>
   );
 };
