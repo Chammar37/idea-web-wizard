@@ -327,7 +327,7 @@ const MindMap = () => {
         style: {
           width: 150,
           height: 60,
-          backgroundColor: getNodeColor(parentNode),
+          backgroundColor: getNodeColor({ id: newId }),
           border: "1px solid #9F9EA1",
           borderRadius: "12px",
           padding: "12px",
